@@ -1,5 +1,6 @@
 
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/c5af41a7-4e3e-41dd-90c5-b7225eb68058)
+
 
 1 | Overview
 This project keeps two small solar panels pointed at the brightest light source by comparing readings from four light-dependent resistors (LDRs) and moving two servos in horizontal (azimuth) and vertical (elevation) axes.

@@ -1,0 +1,76 @@
+#include <Servo.h> 
+
+// Servo objects
+Servo horizontal;
+Servo vertical;
+
+// Servo starting positions
+int servohori = 0;  // Centered
+int servohoriLimitHigh = 180;
+int servohoriLimitLow = 0;
+
+int servovert = 90;  // Centered
+int servovertLimitHigh = 170;
+int servovertLimitLow = 10;
+
+// LDR pin connections (corrected based on your last info)
+int ldrlt = A2; // Top Left LDR
+int ldrrt = A1; // Top Right LDR
+int ldrld = A3; // Bottom Left LDR
+int ldrrd = A0; // Bottom Right LDR
+
+void setup() {
+  horizontal.attach(2);  // Horizontal Servo on D2
+  vertical.attach(4);   // Vertical Servo on D13
+
+  horizontal.write(servohori);
+  vertical.write(servovert);
+
+  delay(2500); // Allow everything to stabilize
+}
+
+void loop() {
+  int lt = analogRead(ldrlt); // Top Left
+  int rt = analogRead(ldrrt); // Top Right
+  int ld = analogRead(ldrld); // Bottom Left
+  int rd = analogRead(ldrrd); // Bottom Right
+
+  int dtime = 10; 
+  int tol = 10; // Tolerance to avoid jitter
+
+  // Average light readings
+  int avt = (lt + rt) / 2; // Average Top sensors
+  int avd = (ld + rd) / 2; // Average Bottom sensors
+  int avl = (lt + ld) / 2; // Average Left sensors
+  int avr = (rt + rd) / 2; // Average Right sensors
+
+  // Differences
+  int dvert = avt - avd;
+  int dhoriz = avl - avr;
+
+  // Vertical Movement (toward light)
+  if (abs(dvert) > tol) {
+    if (avt > avd) {
+      servovert = --servovert; // Move down if Top is brighter
+      if (servovert < servovertLimitLow) servovert = servovertLimitLow;
+    } else {
+      servovert = ++servovert; // Move up if Bottom is brighter
+      if (servovert > servovertLimitHigh) servovert = servovertLimitHigh;
+    }
+    vertical.write(servovert);
+  }
+
+  // Horizontal Movement (toward light)
+  if (abs(dhoriz) > tol) {
+    if (avl > avr) {
+      servohori = ++servohori; // Move left if Left is brighter
+      if (servohori < servohoriLimitLow) servohori = servohoriLimitLow;
+    } else {
+      servohori = --servohori; // Move right if Right is brighter
+      if (servohori > servohoriLimitHigh) servohori = servohoriLimitHigh;
+    }
+    horizontal.write(servohori);
+  }
+
+  delay(dtime);
+}
